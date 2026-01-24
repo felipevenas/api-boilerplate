@@ -1,11 +1,11 @@
 from pydantic import BaseModel, ConfigDict
-from datetime import datetime
+from datetime import datetime, date
 
 class UserBase(BaseModel):
     name: str
     email: str
-    phone: int
-    birth: str
+    phone: str
+    birth: date
 
 class UserCreate(UserBase):
     pass
@@ -20,5 +20,3 @@ class UserRead(UserBase):
 
 class UserUpdate(UserBase):
     active: bool
-    created_at: datetime
-    updated_at: datetime

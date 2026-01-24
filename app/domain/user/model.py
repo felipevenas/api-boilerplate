@@ -6,7 +6,7 @@ class User(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
-    phone = Column(Integer, nullable=False) 
+    phone = Column(String, nullable=False) 
     birth = Column(Date, nullable=False)
     active = Column(Boolean, nullable=False, default=True)
 
