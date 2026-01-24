@@ -1,5 +1,6 @@
 from app.domain.user.repository import UserRepository
 from app.domain.user.schemas import UserCreate, UserRead, UserUpdate
+from app.helpers.phone_formatter import PhoneFormatter as pf
 
 class UserService:
     def __init__(self, repo: UserRepository):
@@ -12,6 +13,7 @@ class UserService:
     
     def post(self, data: UserCreate) -> UserRead:
         """ Cria um novo usuário no banco de dados """
+        data.phone = pf.format(data.phone)
         created_user = self.repo.post(data)
         return UserRead.model_validate(created_user)
 
