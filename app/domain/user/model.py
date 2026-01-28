@@ -9,6 +9,5 @@ class User(Base):
     phone = Column(String(15), nullable=False)
     birth = Column(Date, nullable=False)
     active = Column(Boolean, nullable=False, default=True)
-
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)

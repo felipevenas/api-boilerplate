@@ -59,3 +59,11 @@ def delete(id: int,
     if not deleted_user:
         return error_response("Ocorreu um erro ao deletar o usuário!", deleted_user)
     return success_response(deleted_user, "Usuário deletado com sucesso!")
+
+@router.post("/user/generate-user", status_code=status.HTTP_201_CREATED, summary="Automação que cria um usuário com dados aleatórios")
+def generate_user(service: UserService = Depends(get_user_service)):
+    """ Automação que cria um usuário com dados aleatórios """
+    user = service.generate_user()
+    if not user:
+        return error_response("Ocorreu um erro ao gerar um usuário aleatório!", user)
+    return success_response(user, "Novo usuário gerado com sucesso!")
