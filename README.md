@@ -37,11 +37,13 @@ Use este repositório como template quando precisar criar:
 
 | Tecnologia | Versão | Propósito |
 |-----------|--------|----------|
-| ![Python](https://img.shields.io/badge/Python-3.9+-3776ab?style=flat&logo=python) | 3.9+ | Linguagem principal |
+| ![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat&logo=python) | 3.11+ | Linguagem principal |
 | ![FastAPI](https://img.shields.io/badge/FastAPI-0.128.0-009688?style=flat&logo=fastapi) | 0.128.0 | Framework web |
 | ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.46-d32f2f?style=flat) | 2.0.46 | ORM |
 | ![Pydantic](https://img.shields.io/badge/Pydantic-2.12.5-e92063?style=flat) | 2.12.5 | Validação de dados |
 | ![MySQL](https://img.shields.io/badge/MySQL-asyncmy-4479a1?style=flat&logo=mysql) | asyncmy | Banco de dados |
+| ![Selenium](https://img.shields.io/badge/Selenium-4.40.0-43B02A?style=flat&logo=selenium) | 4.40.0 | Web scraping |
+| ![undetected-chromedriver](https://img.shields.io/badge/undetected--chromedriver-3.5.5-4285F4?style=flat) | 3.5.5 | Automação de navegador |
 
 ## 📁 Arquitetura
 
@@ -64,8 +66,11 @@ api-start/
 │   │       ├── routes.py         # Rotas da entidade
 │   │       ├── schemas.py        # Schemas Pydantic
 │   │       └── service.py        # Lógica de negócio
-│   ├── helpers/                  # Utilitários
+│   ├── helpers/                  # Utilitários (formatadores)
+│   │   ├── birth_formatter.py    # Formatação de data de nascimento
+│   │   └── phone_formatter.py    # Formatação de telefone
 │   └── infra/                    # Infraestrutura
+│       └── generate_user.py      # Automação de geração de usuários
 ├── requeriments.txt              # Dependências
 └── README.md                      # Este arquivo
 ```
@@ -130,11 +135,15 @@ pip install -r requeriments.txt
 ## 📦 Dependências Principais
 
 ```
-fastapi==0.128.0          # Framework web assíncrono
-SQLAlchemy==2.0.46        # ORM para BD
-pydantic==2.12.5          # Validação de dados
-python-dotenv==1.2.1      # Carregamento de variáveis
-starlette==0.50.0         # ASGI framework
+fastapi==0.128.0              # Framework web assíncrono
+SQLAlchemy==2.0.46            # ORM para BD
+pydantic==2.12.5              # Validação de dados
+python-dotenv==1.2.1          # Carregamento de variáveis
+starlette==0.50.0             # ASGI framework
+uvicorn==0.40.0               # Servidor ASGI
+selenium==4.40.0              # Automação de navegador
+undetected-chromedriver==3.5.5 # Chrome driver anti-detecção
+requests==2.32.5              # Requisições HTTP
 ```
 
 ## 💾 Configuração do Banco de Dados
@@ -192,6 +201,69 @@ SessionLocal = sessionmaker(bind=engine)
 5. Implementar `service.py` (Lógica)
 6. Implementar `routes.py` (Endpoints)
 7. Registrar rotas em `app/api/endpoints/routes.py`
+
+## 🤖 Automação de Usuários
+
+### Geração de Usuários Aleatórios
+
+O projeto inclui um sistema de automação inteligente para geração de usuários aleatórios através de web scraping:
+
+#### `generate_user_scraper()`
+
+Função que automatiza a geração de usuários aleatórios utilizando:
+
+- **Selenium** + **undetected-chromedriver**: Automação de navegador que contorna detecção anti-bot
+- **Brave Browser**: Navegador principal (configurável para Chrome)
+- **Site gerador**: https://geradornv.com.br/
+
+**Dados coletados:**
+- Nome completo
+- Data de nascimento
+- Telefone celular
+- Email
+
+**Fluxo:**
+```
+1. Acessa gerador-pessoas → extrai nome e data de nascimento
+2. Acessa gerador-celular → extrai número de telefone
+3. Acessa gerador-email → extrai endereço de email
+4. Formata e valida dados com helpers
+5. Retorna objeto UserCreate pronto para persistência
+```
+
+### Helpers de Formatação
+
+#### `BirthFormatter`
+Formata datas de nascimento do padrão `DD/MM/YYYY` para objeto `date` Python:
+```python
+from app.helpers.birth_formatter import BirthFormatter
+birth_date = BirthFormatter.format("15/03/1990")  # → date(1990, 3, 15)
+```
+
+#### `PhoneFormatter`
+Formata números de telefone para o padrão brasileiro `(XX) XXXXX-XXXX`:
+```python
+from app.helpers.phone_formatter import PhoneFormatter
+formatted = PhoneFormatter.format("11987654321")  # → "(11) 98765-4321"
+```
+
+### Requisitos para Automação
+
+- **Navegador**: Brave Browser (ou Chrome) instalado no sistema
+- **Python 3.11+**: Requerido para compatibilidade com undetected-chromedriver
+- **Variáveis de Ambiente**: Opcional (caminho do navegador)
+
+### Configuração
+
+No arquivo `app/infra/generate_user.py`, você pode customizar:
+
+```python
+# Trocar para Chrome (comentar linha do Brave)
+# options.binary_location = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
+
+# Configurar modo headless
+driver = uc.Chrome(options=options, headless=False)  # True para modo headless
+```
 
 ## 📝 Convenções
 
