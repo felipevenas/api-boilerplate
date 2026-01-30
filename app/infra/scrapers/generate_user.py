@@ -1,5 +1,6 @@
 from app.domain.user.schemas import UserCreate
 from app.helpers.birth_formatter import BirthFormatter as bf
+from app.infra.logging.logger import logger
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -9,8 +10,8 @@ import time
 
 def generate_user_scraper():
     options = uc.ChromeOptions()
-    options.binary_location = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" # Se tiver o Chrome instalado, comente essa linha.
     driver = uc.Chrome(
+        version_main=144,
         options=options,
         headless=False
     )
@@ -19,24 +20,31 @@ def generate_user_scraper():
     try:
         driver.get(f"{url}gerador-pessoas/")
         driver.maximize_window()
+        logger.info(f"🛜 Inicializando navegador maximizado no site: {url}gerador-pessoas/...")
         time.sleep(3)
         name = wait.until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="nv-field-name"]'))
         ).text
+        logger.info(f"👤 Nome coletado com sucesso: {name}")
         time.sleep(3)
         birth = wait.until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="nv-field-birthday"]'))
         ).text
+        logger.info(f"📅 Data de nascimento coletada com sucesso: {birth}")
         driver.get(f"{url}gerador-celular/")
+        logger.info(f"🛜 Trocando de seção no site: {url}gerador-celular/...")
         time.sleep(3)
         phone = wait.until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="nv-field-generator-cellphone"]'))
         ).text
+        logger.info(f"📱 Número de celular coletado com sucesso: {phone}")
         driver.get(f"{url}gerador-email/")
+        logger.info(f"🛜 Trocando de seção no site: {url}gerador-email/...")
         time.sleep(3)
         email = wait.until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="nv-field-generator-email"]'))
         ).text
+        logger.info(f"✉️ E-mail coletado com sucesso: {email}")
         return create_user(
             name=name,
             email=email,
@@ -46,6 +54,7 @@ def generate_user_scraper():
     except ValueError as e:
         raise RuntimeError(f"Erro ao tentar copiar um número aleatório: {str(e)}")
     finally:
+        logger.info(f"⏸️ Encerrando automação...")
         driver.quit()
 
 def create_user(name, email, phone, birth):
