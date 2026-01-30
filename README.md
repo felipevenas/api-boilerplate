@@ -146,7 +146,7 @@ undetected-chromedriver==3.5.5 # Chrome driver anti-detecção
 requests==2.32.5              # Requisições HTTP
 ```
 
-## � Docker & Containerização
+## 🐋 Docker & Containerização
 
 ### Sobre a Infraestrutura de Containers
 
@@ -228,15 +228,15 @@ Adicione ao arquivo `.env`:
 ```env
 # Docker - MySQL
 DB_USER=root
-DB_PASS=sua_senha_mysql
-DB_HOST=mysql
+DB_PASS=sua_senha_aqui
+DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=api_start
+DB_NAME=seu_banco_aqui
 ```
 
 > **Nota**: Quando usar containers, `DB_HOST=mysql` (nome do serviço). Quando usar BD local, `DB_HOST=localhost`.
 
-## �💾 Configuração do Banco de Dados
+## 💾 Configuração do Banco de Dados
 
 ### Conexão (session.py)
 
