@@ -1,4 +1,4 @@
-# ⚡ Projeto de Introdução - FastAPI | DDD | Clean Arch.
+# ⚡ Boilerplate - FastAPI | DDD | Clean Arch.
 
 ## 📖 Propósito
 
@@ -146,7 +146,97 @@ undetected-chromedriver==3.5.5 # Chrome driver anti-detecção
 requests==2.32.5              # Requisições HTTP
 ```
 
-## 💾 Configuração do Banco de Dados
+## � Docker & Containerização
+
+### Sobre a Infraestrutura de Containers
+
+O projeto utiliza **Docker Compose** para orquestrar os containers necessários:
+
+#### Serviços
+
+| Serviço | Imagem | Porta | Propósito |
+|---------|--------|-------|----------|
+| **MySQL** | `mysql:8.0` | 3306 | Banco de dados relacional |
+| **phpMyAdmin** | `phpmyadmin` | 8080 | Interface web para gerenciamento do BD |
+
+#### Arquivo `docker-compose.yml`
+
+```yaml
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_local
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
+```
+
+### Executar Containers
+
+```bash
+# Iniciar containers em background
+docker-compose up -d --build
+
+# Visualizar status dos containers
+docker-compose ps
+
+# Ver logs de um serviço específico
+docker-compose logs -f mysql
+docker-compose logs -f phpmyadmin
+
+# Parar containers
+docker-compose down
+
+# Remover volumes (dados) também
+docker-compose down -v
+```
+
+### Acessar Serviços
+
+- **MySQL**: `localhost:3306` (via ferramentas como DBeaver, MySQL Workbench)
+- **phpMyAdmin**: `http://localhost:8080`
+  - Usuário: `root`
+  - Senha: valor de `DB_PASS` no `.env`
+
+### Variáveis de Ambiente para Docker
+
+Adicione ao arquivo `.env`:
+
+```env
+# Docker - MySQL
+DB_USER=root
+DB_PASS=sua_senha_mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_NAME=api_start
+```
+
+> **Nota**: Quando usar containers, `DB_HOST=mysql` (nome do serviço). Quando usar BD local, `DB_HOST=localhost`.
+
+## �💾 Configuração do Banco de Dados
 
 ### Conexão (session.py)
 
@@ -169,6 +259,56 @@ SessionLocal = sessionmaker(bind=engine)
    ↓
 5. Response → Padrão unificado (response.py)
 ```
+
+## 💉 Injeção de Dependência (Dependency Injection)
+
+O projeto utiliza o sistema de injeção de dependência do FastAPI através da função `Depends()`. Isso permite:
+
+- ✅ Desacoplamento de componentes
+- ✅ Facilita testes unitários
+- ✅ Código mais limpo e manutenível
+- ✅ Reutilização de lógica comum
+
+### Padrão Implementado
+
+**Exemplo - Domínio User:**
+
+```python
+# 1. Factory Function (cria e injeta dependências)
+def get_user_service(db: Session = Depends(get_db)) -> UserService:
+    repo = UserRepository(db)
+    return UserService(repo)
+
+# 2. Route recebe o serviço injetado
+@router.get("/users")
+def get_all(service: UserService = Depends(get_user_service)):
+    return service.get_all()
+```
+
+**Exemplo - Domínio Automation:**
+
+```python
+# 1. Factory Function específica da automação
+def get_automation_service(db: Session = Depends(get_db)) -> AutomationService:
+    repo = UserRepository(db)
+    return AutomationService(repo)
+
+# 2. Route recebe o serviço injetado
+@router.post("/automation/scraper/generate-user")
+def generate_user(service: AutomationService = Depends(get_automation_service)):
+    return service.generate_user()
+```
+
+### Benefícios
+
+| Aspecto | Benefício |
+|--------|----------|
+| **Testabilidade** | Mock de dependências fica trivial |
+| **Escalabilidade** | Adicionar novos domínios segue o mesmo padrão |
+| **Manutenibilidade** | Mudanças em uma camada não afetam outras |
+| **Flexibilidade** | Trocar implementações sem alterar rotas |
+
+
 
 ## 📋 Padrão de Resposta
 
@@ -202,68 +342,215 @@ SessionLocal = sessionmaker(bind=engine)
 6. Implementar `routes.py` (Endpoints)
 7. Registrar rotas em `app/api/endpoints/routes.py`
 
-## 🤖 Automação de Usuários
+## 🤖 Domínio de Automação - Geração de Usuários
+
+### Visão Geral
+
+O projeto inclui um **domínio dedicado de automação** (`app/domain/automation/`) que implementa geração inteligente de usuários aleatórios através de web scraping. Este sistema demonstra como adicionar funcionalidades avançadas mantendo a Clean Architecture.
+
+### Estrutura do Domínio
+
+```
+app/domain/automation/
+├── routes.py      # Endpoints HTTP da automação
+├── services.py    # Lógica de geração de usuários
+└── __pycache__/
+```
+
+### Arquitetura da Automação
+
+#### 1. **Camada de Rota** (`routes.py`)
+
+```python
+@router.post("/automation/scraper/generate-user", 
+             status_code=status.HTTP_201_CREATED, 
+             summary="Automação que cria um usuário com dados aleatórios")
+def generate_user(service: AutomationService = Depends(get_automation_service)):
+    """Automação que cria um usuário com dados aleatórios"""
+    user = service.generate_user()
+    if not user:
+        return error_response("Ocorreu um erro ao gerar um usuário aleatório!", user)
+    return success_response(user, "Novo usuário gerado com sucesso!")
+```
+
+**Injeção de Dependência:**
+```python
+def get_automation_service(db: Session = Depends(get_db)) -> AutomationService:
+    repo = UserRepository(db)
+    return AutomationService(repo)
+```
+
+#### 2. **Camada de Serviço** (`services.py`)
+
+```python
+class AutomationService:
+    def __init__(self, repo: UserRepository):
+        self.repo = repo
+
+    def generate_user(self) -> UserRead:
+        """Gera um novo usuário através de um Web Scraper"""
+        generated_user = generate_user_scraper()
+        generated_user.phone = pf.format(generated_user.phone)
+        user_db = self.repo.post(generated_user)
+        return UserRead.model_validate(user_db)
+```
+
+#### 3. **Camada de Infraestrutura** (`infra/scrapers/generate_user.py`)
+
+Utiliza Selenium + undetected-chromedriver para contornar proteções anti-bot.
+
+### Fluxo de Geração de Usuários
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  POST /automation/scraper/generate-user                  │
+└────────────────────┬─────────────────────────────────────┘
+                     ↓
+        ┌────────────────────────────┐
+        │  AutomationService         │
+        │  ↓ get_automation_service()│
+        └────────────┬───────────────┘
+                     ↓
+        ┌────────────────────────────┐
+        │  generate_user_scraper()   │
+        │  ↓ Acessa 3 sites:         │
+        │    - gerador-pessoas       │
+        │    - gerador-celular       │
+        │    - gerador-email         │
+        └────────────┬───────────────┘
+                     ↓
+        ┌────────────────────────────┐
+        │  Formatação de Dados       │
+        │  - PhoneFormatter          │
+        │  - BirthFormatter          │
+        └────────────┬───────────────┘
+                     ↓
+        ┌────────────────────────────┐
+        │  UserRepository.post()     │
+        │  ↓ Persistência no BD      │
+        └────────────┬───────────────┘
+                     ↓
+        ┌────────────────────────────┐
+        │  Response (UserRead)       │
+        │  ✅ Sucesso                │
+        └────────────────────────────┘
+```
 
 ### Geração de Usuários Aleatórios
 
-O projeto inclui um sistema de automação inteligente para geração de usuários aleatórios através de web scraping:
-
 #### `generate_user_scraper()`
 
-Função que automatiza a geração de usuários aleatórios utilizando:
+Função que automatiza a geração de usuários aleatórios:
 
-- **Selenium** + **undetected-chromedriver**: Automação de navegador que contorna detecção anti-bot
-- **Brave Browser**: Navegador principal (configurável para Chrome)
-- **Site gerador**: https://geradornv.com.br/
+**Tecnologias:**
+- **Selenium**: Automação de navegador
+- **undetected-chromedriver**: Contorna detecção anti-bot
+- **Brave Browser** (ou Chrome): Navegador executado
 
-**Dados coletados:**
-- Nome completo
-- Data de nascimento
-- Telefone celular
-- Email
+**Dados Coletados:**
+- ✅ Nome completo
+- ✅ Data de nascimento (DD/MM/YYYY)
+- ✅ Telefone celular
+- ✅ Email
 
-**Fluxo:**
-```
-1. Acessa gerador-pessoas → extrai nome e data de nascimento
-2. Acessa gerador-celular → extrai número de telefone
-3. Acessa gerador-email → extrai endereço de email
-4. Formata e valida dados com helpers
-5. Retorna objeto UserCreate pronto para persistência
-```
+**Sites Utilizados:**
+- https://geradornv.com.br/ - Gerador de pessoas (nome + data de nascimento)
+- https://geradornv.com.br/ - Gerador de celular
+- https://geradornv.com.br/ - Gerador de email
 
 ### Helpers de Formatação
 
+#### `PhoneFormatter`
+
+Formata números de telefone para o padrão brasileiro `(XX) XXXXX-XXXX`:
+
+```python
+from app.helpers.phone_formatter import PhoneFormatter as pf
+
+# Exemplo
+formatted = pf.format("11987654321")  # → "(11) 98765-4321"
+```
+
 #### `BirthFormatter`
+
 Formata datas de nascimento do padrão `DD/MM/YYYY` para objeto `date` Python:
+
 ```python
 from app.helpers.birth_formatter import BirthFormatter
+
+# Exemplo
 birth_date = BirthFormatter.format("15/03/1990")  # → date(1990, 3, 15)
 ```
 
-#### `PhoneFormatter`
-Formata números de telefone para o padrão brasileiro `(XX) XXXXX-XXXX`:
-```python
-from app.helpers.phone_formatter import PhoneFormatter
-formatted = PhoneFormatter.format("11987654321")  # → "(11) 98765-4321"
-```
+### Requisitos Técnicos
 
-### Requisitos para Automação
+| Requisito | Versão | Observação |
+|-----------|--------|-----------|
+| Python | 3.11+ | Requerido para compatibilidade com undetected-chromedriver |
+| Brave Browser ou Chrome | - | Deve estar instalado no sistema |
+| Selenium | 4.40.0+ | Instalado via `requirements.txt` |
+| undetected-chromedriver | 3.5.5+ | Contorna proteções anti-bot |
 
-- **Navegador**: Brave Browser (ou Chrome) instalado no sistema
-- **Python 3.11+**: Requerido para compatibilidade com undetected-chromedriver
-- **Variáveis de Ambiente**: Opcional (caminho do navegador)
+### Configuração e Customização
 
-### Configuração
-
-No arquivo `app/infra/generate_user.py`, você pode customizar:
+Arquivo: `app/infra/scrapers/generate_user.py`
 
 ```python
-# Trocar para Chrome (comentar linha do Brave)
-# options.binary_location = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
-
-# Configurar modo headless
-driver = uc.Chrome(options=options, headless=False)  # True para modo headless
+# Modo headless (sem interface gráfica)
+driver = uc.Chrome(options=options, headless=True)   # True = headless
 ```
+
+### Exemplo de Uso
+
+```bash
+# Iniciar a API
+uvicorn app.main:app --reload
+
+# Chamar o endpoint via curl
+curl -X POST "http://localhost:8000/automation/scraper/generate-user"
+
+# Ou usar o cliente HTTP (Swagger)
+# Acesse: http://localhost:8000/docs
+# Procure por: /automation/scraper/generate-user
+```
+
+### Resposta de Sucesso
+
+```json
+{
+  "status": "success",
+  "message": "Novo usuário gerado com sucesso!",
+  "data": {
+    "id": 1,
+    "name": "João da Silva",
+    "birth_date": "1990-03-15",
+    "phone": "(11) 98765-4321",
+    "email": "joao.silva@example.com"
+  }
+}
+```
+
+### Boas Práticas da Automação
+
+✅ **Fazer:**
+- Usar undetected-chromedriver para evitar bloqueios
+- Configurar timeouts apropriados
+- Implementar retry logic para falhas temporárias
+- Logar operações importantes
+
+❌ **Evitar:**
+- Fazer requisições muito rápidas (respeitar rate limiting)
+- Usar dados scrapeados para fins ilícitos
+- Acessar dados sem consentimento
+- Ignorar robots.txt e termos de serviço
+
+### Limitações Conhecidas
+
+⚠️ A automação depende de:
+- Disponibilidade dos sites geradores
+- Estructura HTML dos sites (mudanças quebram o scraper)
+- Navegador Brave/Chrome instalado e atualizado
+- Conexão de internet estável
 
 ## 📝 Convenções
 

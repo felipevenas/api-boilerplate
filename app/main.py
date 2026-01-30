@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Request, HTTPException
-import uvicorn
+from fastapi import FastAPI
 
 from app.api.endpoints.routes import router as api_router
 from app.core.config import get_settings
+from app.infra.logging.logger import logger as infra_logger 
 
 settings = get_settings()
 
@@ -18,9 +18,13 @@ app = FastAPI(
     },
     version="1.0.0",
     openapi_tags=[
-        {"name": "Users", "description": "Operações referentes aos Usuários"}
+        {"name": "User", "description": "Operações referentes aos Usuários"},
+        {"name": "Automation", "description": "Automações gerais da API"}
     ]
 )
+
+logger = infra_logger 
+logger.info("▶️ Aplicação iniciando...")
 
 app.include_router(api_router, prefix="/api/v1")
 
