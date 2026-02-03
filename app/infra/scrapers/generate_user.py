@@ -13,7 +13,7 @@ def generate_user_scraper():
     driver = uc.Chrome(
         version_main=144,
         options=options,
-        headless=False
+        headless=True # -> Automação roda em segundo-plano.
     )
     wait = WebDriverWait(driver, 30)
     url = "https://geradornv.com.br/"
