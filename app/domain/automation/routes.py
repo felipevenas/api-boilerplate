@@ -13,7 +13,7 @@ def get_automation_service(db: Session = Depends(get_db)) -> AutomationService:
     repo = UserRepository(db)
     return AutomationService(repo)
 
-@router.post("/automation/scraper/generate-user", status_code=status.HTTP_201_CREATED, summary="Automação que cria um usuário com dados aleatórios")
+@router.post("/automations/scraper/generate-user", status_code=status.HTTP_201_CREATED, summary="Automação que cria um usuário com dados aleatórios")
 def generate_user(service: AutomationService = Depends(get_automation_service)):
     """ Automação que cria um usuário com dados aleatórios """
     user = service.generate_user()

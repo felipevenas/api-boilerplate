@@ -36,7 +36,7 @@ def post(data: UserCreate,
         logger.info("❌ [Domain/User] Erro ao criar um novo usuário!")
         return error_response("Ocorreu um erro ao criar um novo usário!", details=str(e))
     
-@router.get("/user/{id}", status_code=status.HTTP_200_OK, summary="Buscar um usuário pelo ID")
+@router.get("/users/{id}", status_code=status.HTTP_200_OK, summary="Buscar um usuário pelo ID")
 def get_by_id(id: int,
               service: UserService = Depends(get_user_service)):
     """ Busca um usuário através do seu ID """
@@ -47,7 +47,7 @@ def get_by_id(id: int,
     logger.info(f"✅ [Domain/User] Usuário [{id}] encontrado com sucesso!")
     return success_response(user, "Usuário encontrado com sucesso!")
 
-@router.put("/user/{id}", status_code=status.HTTP_200_OK, summary="Alterar dados de um usuário pelo ID")
+@router.put("/users/{id}", status_code=status.HTTP_200_OK, summary="Alterar dados de um usuário pelo ID")
 def put(id: int,
         data: UserUpdate,
         service: UserService = Depends(get_user_service)):
@@ -60,7 +60,7 @@ def put(id: int,
         logger.info("❌ [Domain/User] Erro ao atualizar dados do usuário!")
         return error_response("Ocorreu um erro ao alterar os dados do usuário!", details=str(e))
     
-@router.delete("/user/{id}", status_code=status.HTTP_200_OK, summary="Deleta um usuário pelo ID")
+@router.delete("/users/{id}", status_code=status.HTTP_200_OK, summary="Deleta um usuário pelo ID")
 def delete(id: int,
            service: UserService = Depends(get_user_service)):
     """ Deleta um usuário pelo ID """
