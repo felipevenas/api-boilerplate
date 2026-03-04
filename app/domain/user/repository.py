@@ -3,7 +3,7 @@ from sqlalchemy.future import select
 from datetime import datetime
 
 from app.domain.user.schemas import UserUpdate
-from app.domain.user.model import User
+from app.domain.user.models import User
 
 class UserRepository:
     def __init__(self, db: Session):
@@ -19,6 +19,8 @@ class UserRepository:
         user = User(
             name=data.name,
             email=data.email,
+            username=data.username,
+            password=data.password,
             phone=data.phone,
             birth=data.birth,
             active=True,
@@ -55,3 +57,25 @@ class UserRepository:
         self.db.delete(user)
         self.db.commit()
         return user
+    
+    def get_by_email(self, email: str) -> User | None:
+        """ Busca um usuário através do seu E-mail """
+        result = self.db.execute(select(User).where(User.email == email))
+        return result.scalars().first()
+
+    def get_by_username(self, username: str) -> User | None:
+        """ Busca um usuário através do seu Username """
+        result = self.db.execute(select(User).where(User.username == username))
+        return result.scalars().first()
+    
+    def active(self, id: int) -> User:
+        """ Ativa ou inativa um Usuário através do seu ID """
+        user = self.get_by_id(id)
+        if user:
+            if user.active == True:
+                user.active = False
+            else:
+                user.active = True
+            self.db.commit()
+            self.db.refresh(user)
+            return user

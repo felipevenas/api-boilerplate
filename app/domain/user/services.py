@@ -2,6 +2,7 @@ from app.domain.user.repository import UserRepository
 from app.domain.user.schemas import UserCreate, UserRead, UserUpdate
 from app.helpers.phone_formatter import PhoneFormatter as pf
 from app.infra.logging.logger import logger
+from app.domain.user.models import User
 
 class UserService:
     def __init__(self, repo: UserRepository):
@@ -33,3 +34,18 @@ class UserService:
         """ Deleta um usuário através do seu ID """
         deleted_user = self.repo.delete(id)
         return UserRead.model_validate(deleted_user)
+    
+    def get_by_email(self, email: str) -> User | None:
+        """ Busca um usuário através do seu E-mail """
+        user = self.repo.get_by_email(email)
+        return user
+
+    def get_by_username(self, username: str) -> User | None:
+        """ Busca um usuário através do seu Usuário """
+        user = self.repo.get_by_username(username)
+        return user
+    
+    def active(self, id: int) -> UserRead:
+        """ Desativa ou ativa um Usuário pelo ID """
+        updated_user = self.repo.active(id)
+        return UserRead.model_validate(updated_user)
