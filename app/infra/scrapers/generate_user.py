@@ -49,9 +49,10 @@ def generate_user_scraper():
         return UserCreate(
             name=name,
             email=email,
+            username=str(name.lower().replace(" ", "")), # Gera um usuário através do nome completo do usuário
+            password=str(random.randint(100000, 1000000)), # Gera uma senha numérica aleatória
             phone=phone,
-            birth=bf.format(birth),
-            password=str(random.randint(100000, 1000000)) # Gera uma senha numérica aleatória
+            birth=bf.format(birth)
         )
     except ValueError as e:
         raise RuntimeError(f"Erro ao tentar copiar um número aleatório: {str(e)}")
