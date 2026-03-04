@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 import undetected_chromedriver as uc
 import time
+import random
 
 def generate_user_scraper():
     options = uc.ChromeOptions()
@@ -45,9 +46,11 @@ def generate_user_scraper():
             EC.presence_of_element_located((By.XPATH, '//*[@id="nv-field-generator-email"]'))
         ).text
         logger.info(f"✉️ E-mail coletado com sucesso: {email}")
-        return create_user(
+        return UserCreate(
             name=name,
             email=email,
+            username=str(name.lower().replace(" ", "")), # Gera um usuário através do nome completo do usuário
+            password=str(random.randint(100000, 1000000)), # Gera uma senha numérica aleatória
             phone=phone,
             birth=bf.format(birth)
         )
@@ -56,11 +59,3 @@ def generate_user_scraper():
     finally:
         logger.info(f"⏸️ Encerrando automação...")
         driver.quit()
-
-def create_user(name, email, phone, birth):
-    return UserCreate(
-        name=name,
-        email=email,
-        phone=phone,
-        birth=birth
-    )

@@ -7,8 +7,9 @@ from app.domain.user.services import UserService
 from app.domain.user.schemas import UserCreate, UserUpdate
 from app.core.response import success_response, error_response
 from app.infra.logging.logger import logger
+from app.api.auth.dependencies import get_current_user
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 def get_user_service(db: Session = Depends(get_db)) -> UserService:
     repo = UserRepository(db)
@@ -70,3 +71,37 @@ def delete(id: int,
         return error_response("Ocorreu um erro ao deletar o usuário!", deleted_user)
     logger.info("✅ [Domain/User] Usuário deletado com sucesso!")
     return success_response(deleted_user, "Usuário deletado com sucesso!")
+
+@router.get("/users/by-email/{email}", status_code=status.HTTP_200_OK, summary="Buscar um usuário pelo E-mail")
+def get_by_email(email: str,
+                service: UserService = Depends(get_user_service)):
+    """ Busca um usuário através do seu E-mail """
+    user = service.get_by_email(email)
+    if not user:
+        logger.info(f"❌ [Domain/User] Erro ao buscar usuário!")
+        return error_response("Ocorreu um erro ao buscar o usuário!", user)
+    logger.info(f"✅ [Domain/User] Usuário [{email}] encontrado com sucesso!")
+    return success_response(user, "Usuário encontrado com sucesso!")
+
+@router.get("/users/by-username/{username}", status_code=status.HTTP_200_OK, summary="Buscar um usuário pelo Username")
+def get_by_username(username: str,
+                service: UserService = Depends(get_user_service)):
+    """ Busca um usuário através do seu Usuário """
+    user = service.get_by_username(username)
+    if not user:
+        logger.info(f"❌ [Domain/User] Erro ao buscar usuário!")
+        return error_response("Ocorreu um erro ao buscar o usuário!", user)
+    logger.info(f"✅ [Domain/User] Usuário [{username}] encontrado com sucesso!")
+    return success_response(user, "Usuário encontrado com sucesso!")
+
+@router.put("/users/active/{id}", status_code=status.HTTP_200_OK, summary="Ativar ou Inativar um Usuário pelo ID")
+def active(id: int,
+            service: UserService = Depends(get_user_service)):
+    """ Ativa ou inativa um Usuário através do seu ID """
+    try:
+        updated_user = service.active(id)
+        logger.info(f"✅ [Domain/User] Usuário [{id}] atualizado com sucesso!")
+        return success_response(updated_user, "Dados do usuário alterados com sucesso!")
+    except ValueError as e:
+        logger.info("❌ [Domain/User] Erro ao atualizar dados do usuário!")
+        return error_response("Ocorreu um erro ao alterar os dados do usuário!", details=str(e))

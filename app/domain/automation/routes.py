@@ -6,8 +6,9 @@ from app.domain.user.repository import UserRepository
 from app.domain.automation.services import AutomationService
 from app.core.response import success_response, error_response
 from app.infra.logging.logger import logger
+from app.api.auth.dependencies import get_current_user
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 def get_automation_service(db: Session = Depends(get_db)) -> AutomationService:
     repo = UserRepository(db)

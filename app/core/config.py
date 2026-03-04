@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     DB_PORT: str = os.getenv("DB_PORT")
     DB_NAME: str = os.getenv("DB_NAME")
 
+    # Segurança
+    SECRET_KEY: str = os.getenv("SECRET_KEY")
+    ACESS_TOKEN_EXPIRE_MINUTES: int = os.getenv("ACESS_TOKEN_EXPIRE_MINUTES")
+    ALGORITHM: str = os.getenv("ALGORITHM")
+
     class Config:
         env_file = str(env_path)
         env_file_encoding = "utf-8"

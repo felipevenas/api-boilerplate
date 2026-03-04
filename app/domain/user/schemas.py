@@ -1,13 +1,17 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 from datetime import datetime, date
+from typing import Optional
 
 class UserBase(BaseModel):
     name: str
-    email: str
+    email: EmailStr
+    username: str
     phone: str
     birth: date
 
 class UserCreate(UserBase):
+    username: str
+    password: str
     pass
 
 class UserRead(UserBase):
@@ -18,5 +22,10 @@ class UserRead(UserBase):
     created_at: datetime
     updated_at: datetime
 
-class UserUpdate(UserBase):
-    active: bool
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    birth: Optional[date] = None
+    active: Optional[bool] = None
+
