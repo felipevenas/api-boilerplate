@@ -18,6 +18,7 @@ app = FastAPI(
     },
     version="1.0.0",
     openapi_tags=[
+        {"name": "Auth", "description": "Processos de autenticação do Usuário"},
         {"name": "User", "description": "Operações referentes aos Usuários"},
         {"name": "Automation", "description": "Automações gerais da API"}
     ]
