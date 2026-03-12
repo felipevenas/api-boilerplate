@@ -11,7 +11,8 @@ class UserRepository:
     
     def get_all(self) -> list[User]:
         """ Lista todos os usuários do banco de dados através de um SELECT """
-        result = self.db.execute(select(User))
+        result = self.db.execute(select(User)
+                                 .filter(User.active == True))
         return result.scalars().all()
     
     def post(self, data) -> User:
