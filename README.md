@@ -1,327 +1,379 @@
-# ⚡ Boilerplate - FastAPI | DDD | Clean Arch.
+<div align="center">
 
-## 📖 Propósito
+# FastAPI Boilerplate ⚡
 
-Este repositório foi desenvolvido como uma **base de conhecimento estruturada** para servir como referência na construção de futuras aplicações. É um **boilerplate profissional** que demonstra na prática:
+**A compact FastAPI starter with a domain-oriented layout, SQLAlchemy persistence, JWT authentication, and a Selenium-based user generator.**
 
-### 🎯 Objetivos
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.128.0-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.46-D71F00?style=for-the-badge&logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Selenium](https://img.shields.io/badge/Selenium-4.16.0-43B02A?style=for-the-badge&logo=selenium&logoColor=white)](https://www.selenium.dev/)
+[![Status](https://img.shields.io/badge/Status-Boilerplate-blue?style=for-the-badge)](#overview)
+[![License](https://img.shields.io/badge/License-Not%20specified-red?style=for-the-badge)](#license)
 
-- **Arquitetura Limpa (Clean Architecture)** - Separação clara de responsabilidades em camadas bem definidas
-- **Domain-Driven Design (DDD)** - Organização por domínios de negócio, facilitando manutenção e escalabilidade
-- **Padrões de Código** - Implementação de convenções e padrões reconhecidos na comunidade
-- **Type Safety** - Uso de type hints e validação rigorosa de dados
-- **Maintainability** - Código organizado, testável e fácil de estender
-- **Async-First** - Operações assíncronas para melhor performance
+<br />
 
-### 🎓 O que você aprenderá
+<p align="center">
+  <a href="#overview"><b>Overview</b></a> •
+  <a href="#stack"><b>Stack</b></a> •
+  <a href="#architecture"><b>Architecture</b></a> •
+  <a href="#quick-start"><b>Quick Start</b></a> •
+  <a href="#configuration"><b>Configuration</b></a> •
+  <a href="#api-surface"><b>API</b></a> •
+  <a href="#testing"><b>Testing</b></a> •
+  <a href="#deployment"><b>Deployment</b></a> •
+  <a href="#known-limitations"><b>Limitations</b></a> •
+  <a href="#governance"><b>Governance</b></a>
+</p>
 
-- Como estruturar um projeto FastAPI profissionalmente
-- Padrão Repository para abstração de acesso a dados
-- Padrão Service para lógica de negócio
-- Validação robusta com Pydantic v2
-- Configuração de banco de dados com SQLAlchemy 2.0
-- Respostas padronizadas e tratamento de erros
-- Variáveis de ambiente com dotenv
+</div>
 
-### 💡 Caso de Uso
+---
 
-Use este repositório como template quando precisar criar:
-- APIs RESTful escaláveis
-- Microserviços bem estruturados
-- Aplicações que requerem boas práticas arquiteturais
-- Projetos que necessitam de base sólida para crescimento futuro
+> **Repository:** [felipevenas/api-boilerplate](https://github.com/felipevenas/api-boilerplate) ·
+> **Default branch:** `master` (not `main`) ·
+> **Interactive API docs:** `http://localhost:8000/docs` after starting the app
 
-> Uma API robusta e bem estruturada com padrões de desenvolvimento profisionais.
+## Overview
 
-## 🏷️ Stack
+`api-boilerplate` is a teaching-oriented **FastAPI template**. It shows a readable, domain-oriented way to structure a Python API: HTTP routes stay thin, services own business rules, repositories own persistence, and Pydantic v2 schemas validate the boundary.
 
-| Tecnologia | Versão | Propósito |
-|-----------|--------|----------|
-| ![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat&logo=python) | 3.11+ | Linguagem principal |
-| ![FastAPI](https://img.shields.io/badge/FastAPI-0.128.0-009688?style=flat&logo=fastapi) | 0.128.0 | Framework web |
-| ![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.46-d32f2f?style=flat) | 2.0.46 | ORM |
-| ![Pydantic](https://img.shields.io/badge/Pydantic-2.12.5-e92063?style=flat) | 2.12.5 | Validação de dados |
-| ![MySQL](https://img.shields.io/badge/MySQL-asyncmy-4479a1?style=flat&logo=mysql) | asyncmy | Banco de dados |
-| ![Selenium](https://img.shields.io/badge/Selenium-4.40.0-43B02A?style=flat&logo=selenium) | 4.40.0 | Web scraping |
-| ![undetected-chromedriver](https://img.shields.io/badge/undetected--chromedriver-3.5.5-4285F4?style=flat) | 3.5.5 | Automação de navegador |
+The repository covers four concerns:
 
-## 📁 Arquitetura
+| Area | What is implemented |
+|---|---|
+| Authentication | Registration, username/password login through the OAuth2 password form, HS256 JWT access tokens, and a `get_current_user` dependency |
+| Users | Create, list, read, update, delete, look up by e-mail or username, and toggle `active` |
+| Automation | An authenticated endpoint that scrapes fake identity data with Selenium and persists it as a user |
+| Platform | Swagger UI and ReDoc, standard response helpers, daily rotating logs, and Docker Compose for MySQL 8.0 plus phpMyAdmin |
 
-```
-api-start/
+> **This is a boilerplate, not a production service.** It has no automated tests, CI pipeline, database migrations, container image, rate limiting, or license file. Read [Known Limitations](#known-limitations) before reusing it. The code is intentionally small so the structure is easy to study and extend.
+
+### Who this is for
+
+- Developers starting a new FastAPI project who want a concrete layering reference.
+- Students comparing DDD-oriented folder organization with a classic layered API.
+- Teams looking for a starting point that they will harden before production.
+
+### What this repository owns
+
+Only the Python API. MySQL and phpMyAdmin are provisioned locally by `docker-compose.yml`; there is no frontend, no worker, and no deployment automation in this repository.
+
+## Stack
+
+Versions below were verified against [`requeriments.txt`](requeriments.txt) and the source imports. There is no lockfile, `pyproject.toml`, or `setup.py`, so the text file is the only dependency manifest.
+
+| Technology | Version | Role |
+|---|---|---|
+| Python | 3.10+ | Minimum required by the `list[...]` and `X \| None` syntax used in the source. A `pyproject.toml` declaring this is not present. |
+| FastAPI | 0.128.0 | HTTP framework, dependency injection, OpenAPI generation |
+| Starlette | 0.50.0 | ASGI foundation used by FastAPI |
+| Uvicorn | 0.40.0 | ASGI server |
+| Pydantic | 2.12.5 | Request/response validation |
+| pydantic-settings | 2.12.0 | Environment-backed settings |
+| SQLAlchemy | 2.0.46 | ORM and session management |
+| PyMySQL | 1.1.2 | MySQL driver used by the `mysql+pymysql` URL |
+| python-jose | 3.5.0 | JWT encoding and decoding |
+| Passlib + bcrypt | 1.7.4 / 4.0.1 | Password hashing |
+| python-dotenv | 1.2.1 | `.env` loading |
+| python-multipart | 0.0.20 | Form parsing for the OAuth2 password login |
+| Selenium | 4.16.0 | Browser automation for the scraper |
+| undetected-chromedriver | 3.5.5 | Chromedriver wrapper used by the scraper |
+| MySQL | 8.0 | Database image in `docker-compose.yml` |
+| Docker Compose | v2 syntax | Local MySQL and phpMyAdmin only |
+
+> The previous documentation claimed `asyncmy`, Selenium `4.40.0`, and `DB_PASSWORD`. Those do not match the repository. The actual driver is **PyMySQL**, the actual Selenium pin is **4.16.0**, and the actual variable is **`DB_PASS`**.
+
+## Architecture
+
+```text
+api-boilerplate/
 ├── app/
+│   ├── main.py                       # FastAPI app, OpenAPI metadata, root route
 │   ├── api/
+│   │   ├── auth/
+│   │   │   └── dependencies.py       # OAuth2 bearer scheme and get_current_user
 │   │   └── endpoints/
-│   │       └── routes.py         # Rotas principais
+│   │       └── routes.py             # Aggregates domain routers under /api/v1
 │   ├── core/
-│   │   ├── config.py             # Configurações da aplicação
-│   │   └── response.py           # Modelos padrão de resposta
+│   │   ├── auth.py                   # Password hashing and JWT helpers
+│   │   ├── config.py                 # Pydantic settings loaded from .env
+│   │   └── response.py               # success_response / error_response helpers
 │   ├── db/
-│   │   ├── base_class.py         # Classe base para modelos
-│   │   └── session.py            # Configuração de sessão BD
+│   │   ├── base_class.py             # SQLAlchemy declarative Base
+│   │   └── session.py                # Engine, SessionLocal, get_db
 │   ├── domain/
+│   │   ├── auth/
+│   │   │   ├── routes.py             # /register, /login, /me
+│   │   │   └── schemas.py            # RegisterRequest, TokenResponse
+│   │   ├── automation/
+│   │   │   ├── routes.py             # /automations/scraper/generate-user
+│   │   │   └── services.py           # AutomationService
 │   │   └── user/
-│   │       ├── model.py          # Modelo SQLAlchemy
-│   │       ├── repository.py     # Acesso aos dados
-│   │       ├── routes.py         # Rotas da entidade
-│   │       ├── schemas.py        # Schemas Pydantic
-│   │       └── service.py        # Lógica de negócio
-│   ├── helpers/                  # Utilitários (formatadores)
-│   │   ├── birth_formatter.py    # Formatação de data de nascimento
-│   │   └── phone_formatter.py    # Formatação de telefone
-│   └── infra/                    # Infraestrutura
-│       └── generate_user.py      # Automação de geração de usuários
-├── requeriments.txt              # Dependências
-└── README.md                      # Este arquivo
+│   │       ├── models.py             # SQLAlchemy User model
+│   │       ├── repository.py         # UserRepository
+│   │       ├── routes.py             # User CRUD and lookups
+│   │       ├── schemas.py            # UserCreate, UserRead, UserUpdate
+│   │       └── services.py           # UserService
+│   ├── helpers/
+│   │   ├── birth_formatter.py        # DD/MM/YYYY -> date
+│   │   └── phone_formatter.py        # Digits -> (XX) XXXXX-XXXX
+│   └── infra/
+│       ├── logging/
+│       │   └── logger.py             # Daily rotating file + console logger
+│       └── scrapers/
+│           └── generate_user.py      # Selenium/undetected-chromedriver scraper
+├── docker-compose.yml                # MySQL 8.0 + phpMyAdmin
+├── requeriments.txt                  # Pinned dependencies (filename misspelled)
+├── README.md
+└── .gitignore
 ```
 
-## 🏗️ Padrão de Arquitetura
+### Request flow
 
-A aplicação segue o padrão **Clean Architecture** com separação de responsabilidades:
-
-### Camadas
-
-```
-┌─────────────────────────────────────┐
-│      API / Routes (Endpoints)       │  ← Requisições HTTP
-├─────────────────────────────────────┤
-│        Service (Lógica)             │  ← Regras de negócio
-├─────────────────────────────────────┤
-│     Repository (Persistência)       │  ← Acesso ao BD
-├─────────────────────────────────────┤
-│   Models + Database Session         │  ← BD
-└─────────────────────────────────────┘
+```mermaid
+flowchart LR
+    Client[HTTP client] --> Routers[FastAPI routers<br/>/api/v1]
+    Routers --> Auth[get_current_user<br/>JWT dependency]
+    Routers --> Services[Domain services]
+    Services --> Repos[Repositories]
+    Repos --> DB[(MySQL 8.0)]
+    Services --> Scraper[Selenium scraper<br/>automation module]
+    Services --> Helpers[Formatters]
 ```
 
-### Domain-Driven Design
+### Layer responsibilities
 
-Cada entidade (ex: `user`) possui:
-- **model.py** - Definição do modelo de dados (SQLAlchemy)
-- **schemas.py** - Schemas de validação (Pydantic)
-- **repository.py** - Operações de persistência
-- **service.py** - Lógica de negócio
-- **routes.py** - Endpoints HTTP
+| Layer | Location | Responsibility | Should not |
+|---|---|---|---|
+| Routes | `app/domain/*/routes.py` | Parse HTTP input, declare status codes, call services, shape responses | Contain SQL or business rules |
+| Schemas | `app/domain/*/schemas.py` | Validate and serialize payloads with Pydantic | Touch the database |
+| Services | `app/domain/*/services.py` | Business rules and orchestration | Build HTTP responses or import FastAPI |
+| Repositories | `app/domain/user/repository.py` | SQLAlchemy queries and commits | Validate HTTP payloads |
+| Models | `app/domain/user/models.py` | Table mapping | Know about routes or schemas |
+| Core | `app/core/` | Settings, JWT/password helpers, response envelopes | Know about a specific domain |
+| Infrastructure | `app/infra/` | Logging and browser automation | Be imported by routes directly |
 
-## 🚀 Configuração
+### Design notes
 
-### Variáveis de Ambiente
+- The structure is **domain-oriented** and inspired by Clean Architecture and DDD, but it is **not** a strict ports-and-adapters implementation. Routes instantiate concrete services, and `UserService` depends on the concrete `UserRepository`. There are no interfaces or dependency-inversion containers.
+- Dependency injection uses FastAPI's `Depends`. Each domain exposes a factory such as `get_user_service(db)` that wires `UserRepository` into the service.
+- Persistence is synchronous SQLAlchemy 2.0. Route handlers are declared with `def`, so FastAPI runs them in its thread pool. The project does **not** use async SQLAlchemy or `async def` handlers.
+- All API routers are mounted under `/api/v1` in `app/main.py`.
+- OpenAPI metadata (`title`, description, contact, tags, version `1.0.0`) is defined inline in `app/main.py`. The descriptions are currently in Portuguese.
 
-Crie um arquivo `.env` na raiz do projeto:
+## Quick Start
 
-```env
-DB_USER=seu_usuario
-DB_PASSWORD=sua_senha
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=sua_base_dados
+### Prerequisites
+
+- **Python 3.10+** with `pip`.
+- **Docker Desktop** (or any Docker Engine with Compose v2) for MySQL and phpMyAdmin.
+- **Google Chrome 144** if you intend to call the scraper endpoint. `generate_user.py` hardcodes `version_main=144`.
+- **Git**.
+
+### 1. Clone the repository
+
+```powershell
+git clone https://github.com/felipevenas/api-boilerplate.git
+cd api-boilerplate
 ```
 
-### Instalação
+### 2. Create and activate a virtual environment
+
+Windows (PowerShell):
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+```
+
+Linux/macOS:
 
 ```bash
-# Criar ambiente virtual
-python -m venv venv
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+```
 
-# Ativar ambiente virtual
-# Windows
-venv\Scripts\activate
-# Linux/Mac
-source venv/bin/activate
+### 3. Install dependencies
 
-# Instalar dependências
+```bash
 pip install -r requeriments.txt
 ```
 
-## 📦 Dependências Principais
+> The file name is intentionally documented as **`requeriments.txt`** because that is what the repository contains. Do not rename it in a documentation-only change; see [Known Limitations](#known-limitations).
 
-```
-fastapi==0.128.0              # Framework web assíncrono
-SQLAlchemy==2.0.46            # ORM para BD
-pydantic==2.12.5              # Validação de dados
-python-dotenv==1.2.1          # Carregamento de variáveis
-starlette==0.50.0             # ASGI framework
-uvicorn==0.40.0               # Servidor ASGI
-selenium==4.40.0              # Automação de navegador
-undetected-chromedriver==3.5.5 # Chrome driver anti-detecção
-requests==2.32.5              # Requisições HTTP
-```
+### 4. Create the `.env` file
 
-## 🐋 Docker & Containerização
-
-### Sobre a Infraestrutura de Containers
-
-O projeto utiliza **Docker Compose** para orquestrar os containers necessários:
-
-#### Serviços
-
-| Serviço | Imagem | Porta | Propósito |
-|---------|--------|-------|----------|
-| **MySQL** | `mysql:8.0` | 3306 | Banco de dados relacional |
-| **phpMyAdmin** | `phpmyadmin` | 8080 | Interface web para gerenciamento do BD |
-
-#### Arquivo `docker-compose.yml`
-
-```yaml
-version: '3.9'
-
-services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_local
-    restart: unless-stopped
-    ports:
-      - "${DB_PORT}:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASS}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-    depends_on:
-      - mysql
-
-volumes:
-  mysql_data:
-```
-
-### Executar Containers
-
-```bash
-# Iniciar containers em background
-docker-compose up -d --build
-
-# Visualizar status dos containers
-docker-compose ps
-
-# Ver logs de um serviço específico
-docker-compose logs -f mysql
-docker-compose logs -f phpmyadmin
-
-# Parar containers
-docker-compose down
-
-# Remover volumes (dados) também
-docker-compose down -v
-```
-
-### Acessar Serviços
-
-- **MySQL**: `localhost:3306` (via ferramentas como DBeaver, MySQL Workbench)
-- **phpMyAdmin**: `http://localhost:8080`
-  - Usuário: `root`
-  - Senha: valor de `DB_PASS` no `.env`
-
-### Variáveis de Ambiente para Docker
-
-Adicione ao arquivo `.env`:
+Create `.env` at the repository root (next to `docker-compose.yml`):
 
 ```env
-# Docker - MySQL
 DB_USER=root
-DB_PASS=sua_senha_aqui
-DB_HOST=localhost
+DB_PASS=change-me
+DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_NAME=seu_banco_aqui
+DB_NAME=api_boilerplate
+
+SECRET_KEY=replace-with-a-long-random-value
+ACESS_TOKEN_EXPIRE_MINUTES=60
+ALGORITHM=HS256
 ```
 
-> **Nota**: Quando usar containers, `DB_HOST=mysql` (nome do serviço). Quando usar BD local, `DB_HOST=localhost`.
+`DB_HOST` must be reachable from the process running Uvicorn. Use `127.0.0.1` when the API runs on the host and MySQL runs in Docker. `.env` is ignored by Git and must never be committed.
 
-## 💾 Configuração do Banco de Dados
+### 5. Start MySQL and phpMyAdmin
 
-### Conexão (session.py)
-
-```python
-DATABASE_URL = f"mysql+asyncmy://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine)
+```bash
+docker compose up -d
 ```
 
-## 🔄 Fluxo de Requisição
+| Service | URL / port | Credentials |
+|---|---|---|
+| MySQL | `localhost:${DB_PORT}` (default example: `3306`) | `root` / value of `DB_PASS` |
+| phpMyAdmin | `http://localhost:8080` | `root` / value of `DB_PASS` |
 
-```
-1. Request HTTP
-   ↓
-2. Router → Validação (Pydantic/Schemas)
-   ↓
-3. Service → Lógica de Negócio
-   ↓
-4. Repository → Operação no BD
-   ↓
-5. Response → Padrão unificado (response.py)
-```
+Check status with `docker compose ps`. Stop with `docker compose down`; add `-v` to delete the database volume.
 
-## 💉 Injeção de Dependência (Dependency Injection)
+### 6. Create the `users` table
 
-O projeto utiliza o sistema de injeção de dependência do FastAPI através da função `Depends()`. Isso permite:
+The application does **not** create tables and there is **no migration tool** (no Alembic, no `Base.metadata.create_all`). Create the schema manually before exercising the user endpoints. The reference DDL below is derived from `app/domain/user/models.py`:
 
-- ✅ Desacoplamento de componentes
-- ✅ Facilita testes unitários
-- ✅ Código mais limpo e manutenível
-- ✅ Reutilização de lógica comum
-
-### Padrão Implementado
-
-**Exemplo - Domínio User:**
-
-```python
-# 1. Factory Function (cria e injeta dependências)
-def get_user_service(db: Session = Depends(get_db)) -> UserService:
-    repo = UserRepository(db)
-    return UserService(repo)
-
-# 2. Route recebe o serviço injetado
-@router.get("/users")
-def get_all(service: UserService = Depends(get_user_service)):
-    return service.get_all()
+```sql
+CREATE TABLE IF NOT EXISTS users (
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(60) NOT NULL,
+    email VARCHAR(60) NOT NULL,
+    username VARCHAR(60) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(15) NOT NULL,
+    birth DATE NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
 
-**Exemplo - Domínio Automation:**
+You can run it in phpMyAdmin or with `docker compose exec mysql mysql -uroot -p"$DB_PASS" "$DB_NAME"`. A dedicated database user and migrations are recommended follow-ups.
 
-```python
-# 1. Factory Function específica da automação
-def get_automation_service(db: Session = Depends(get_db)) -> AutomationService:
-    repo = UserRepository(db)
-    return AutomationService(repo)
+### 7. Start the API
 
-# 2. Route recebe o serviço injetado
-@router.post("/automation/scraper/generate-user")
-def generate_user(service: AutomationService = Depends(get_automation_service)):
-    return service.generate_user()
+```bash
+uvicorn app.main:app --reload
 ```
 
-### Benefícios
+The API starts at **http://localhost:8000**.
 
-| Aspecto | Benefício |
-|--------|----------|
-| **Testabilidade** | Mock de dependências fica trivial |
-| **Escalabilidade** | Adicionar novos domínios segue o mesmo padrão |
-| **Manutenibilidade** | Mudanças em uma camada não afetam outras |
-| **Flexibilidade** | Trocar implementações sem alterar rotas |
+| Endpoint | URL |
+|---|---|
+| Root health-style message | `GET http://localhost:8000/` |
+| Swagger UI | `http://localhost:8000/docs` |
+| ReDoc | `http://localhost:8000/redoc` |
+| OpenAPI JSON | `http://localhost:8000/openapi.json` |
 
+Smoke test:
 
+```powershell
+curl.exe http://localhost:8000/
+```
 
-## 📋 Padrão de Resposta
+### 8. Authenticate and call a protected route
 
-### Sucesso
+Register a user, then log in with the **username** (not the e-mail):
+
+```bash
+curl -X POST http://localhost:8000/api/v1/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Ada Lovelace","email":"ada@example.com","username":"ada","password":"change-me","phone":"11987654321","birth":"1990-03-15"}'
+
+curl -X POST http://localhost:8000/api/v1/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=ada&password=change-me"
+```
+
+Copy `access_token` from the login response and send it as `Authorization: Bearer <token>` on protected routes.
+
+## Configuration
+
+Settings are defined in `app/core/config.py`, loaded from `.env` at the repository root, and cached with `lru_cache`. Restart the process after changing any value. There is no `.env.example`; the table below is the reference.
+
+### Application and security
+
+| Variable | Required | Example | Description |
+|---|---|---|---|
+| `SECRET_KEY` | **Yes** | `replace-with-a-long-random-value` | HMAC key used to sign and verify JWTs. Use a long random value and never commit it. |
+| `ACESS_TOKEN_EXPIRE_MINUTES` | **Yes** | `60` | Access-token lifetime in minutes. The variable name is misspelled in the source; keep the typo until a coordinated code change. |
+| `ALGORITHM` | **Yes** | `HS256` | JWT signing algorithm passed to python-jose. |
+
+### Database
+
+| Variable | Required | Example | Description |
+|---|---|---|---|
+| `DB_USER` | **Yes** | `root` | MySQL user. |
+| `DB_PASS` | **Yes** | `change-me` | MySQL password. Also used by Docker Compose as `MYSQL_ROOT_PASSWORD`. |
+| `DB_HOST` | **Yes** | `127.0.0.1` | MySQL host. Use the service name only when the API itself runs inside the Compose network. |
+| `DB_PORT` | **Yes** | `3306` | MySQL port. Also used by Docker Compose as the published host port. |
+| `DB_NAME` | **Yes** | `api_boilerplate` | Database name. Also used by Docker Compose as `MYSQL_DATABASE`. |
+
+The connection URL is assembled as:
+
+```text
+mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}
+```
+
+**Notes**
+
+- All eight variables are effectively required: the settings fields have no usable defaults, and a missing value fails validation at startup.
+- `DB_PASS` is interpolated into the URL verbatim. Characters such as `@`, `:`, `/`, or `#` can break the URL; use an alphanumeric password or URL-encode it. Adding proper URL encoding is a recommended fix.
+- Docker Compose reads `DB_PORT`, `DB_PASS`, and `DB_NAME` from the same `.env` file. It does not start the API.
+- `MYSQL_ALLOW_EMPTY_PASSWORD: "yes"` is present alongside `MYSQL_ROOT_PASSWORD`. Do not expose this database outside local development.
+
+## API Surface
+
+All application routes are mounted under `/api/v1` except the root and the documentation endpoints. Authentication uses the OAuth2 password flow with a JWT bearer token. The OpenAPI title is `Projeto - API Introduction`, version `1.0.0`.
+
+### Routes
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `GET` | `/` | Public | Health-style message returned by `app/main.py`. |
+| `POST` | `/api/v1/register` | Public | Creates a user from `RegisterRequest`. Returns `201` with a `UserRead` object. Rejects a duplicate e-mail with `409`. |
+| `POST` | `/api/v1/login` | Public | OAuth2 password form (`username`, `password`). Returns `access_token` and `token_type`. Inactive users are rejected with `401`. |
+| `GET` | `/api/v1/me` | Bearer | Returns the authenticated `User` ORM object. See the security note below. |
+| `GET` | `/api/v1/users` | Bearer | Lists active users (the repository filters `active == True`). |
+| `POST` | `/api/v1/` | Bearer | Creates a user from `UserCreate`. Note the path: router root, not `/users`. The password is stored without hashing on this path. |
+| `GET` | `/api/v1/users/{id}` | Bearer | Returns one user by numeric ID. |
+| `PUT` | `/api/v1/users/{id}` | Bearer | Updates name, e-mail, phone, birth, and active status. |
+| `DELETE` | `/api/v1/users/{id}` | Bearer | Deletes a user by ID. |
+| `GET` | `/api/v1/users/by-email/{email}` | Bearer | Looks up a user by e-mail. |
+| `GET` | `/api/v1/users/by-username/{username}` | Bearer | Looks up a user by username. |
+| `PUT` | `/api/v1/users/active/{id}` | Bearer | Toggles the `active` flag. |
+| `POST` | `/api/v1/automations/scraper/generate-user` | Bearer | Runs the Selenium scraper, formats the data, hashes the password, and persists a user. Returns `201`. |
+| `GET` | `/docs` | Public | Swagger UI. |
+| `GET` | `/redoc` | Public | ReDoc. |
+| `GET` | `/openapi.json` | Public | OpenAPI schema. |
+
+### Authentication details
+
+- `app/core/auth.py` signs a payload containing only `sub` (the user ID as a string) and `exp`.
+- `app/api/auth/dependencies.py` decodes the token, converts `sub` to an integer, loads the user, and returns it. Any decoding or subject-parsing failure becomes `401`; database errors propagate.
+- The bearer scheme declares `tokenUrl="/api/v1/login"`.
+- There is no refresh token, token revocation list, audience claim, issuer claim, or key rotation.
+
+### Response formats
+
+The user and automation routers use the helpers in `app/core/response.py`:
+
 ```json
 {
   "status": "success",
-  "message": "Resposta obtida com sucesso!",
-  "data": { }
+  "message": "Usuarios retornados com sucesso!",
+  "data": {}
 }
 ```
 
-### Erro
 ```json
 {
   "status": "error",
@@ -330,252 +382,150 @@ def generate_user(service: AutomationService = Depends(get_automation_service)):
 }
 ```
 
-## 🛠️ Desenvolvimento
+The format is **not uniform across the API**:
 
-### Adicionar Nova Entidade
+- Auth routes return bare Pydantic models (`UserRead`, `TokenResponse`).
+- `HTTPException` and request-validation failures return FastAPI's default `{"detail": ...}` / `{"detail": [...]}` shape.
+- Several not-found and failure branches return **HTTP 200** with `status: "error"` instead of a 4xx status.
 
-1. Criar pasta em `app/domain/{entidade}/`
-2. Implementar `model.py` (SQLAlchemy)
-3. Implementar `schemas.py` (Pydantic)
-4. Implementar `repository.py` (CRUD)
-5. Implementar `service.py` (Lógica)
-6. Implementar `routes.py` (Endpoints)
-7. Registrar rotas em `app/api/endpoints/routes.py`
+Runtime message strings and OpenAPI descriptions are currently in Portuguese. Translating them changes the API contract and source code, so it is intentionally out of scope for this documentation pass.
 
-## 🤖 Domínio de Automação - Geração de Usuários
+## Testing
 
-### Visão Geral
+**There is no automated test suite in this repository.** No `tests/` directory, `pytest` dependency, test configuration, coverage tool, linter, type checker, or CI workflow is present. Do not claim test coverage for this template.
 
-O projeto inclui um **domínio dedicado de automação** (`app/domain/automation/`) que implementa geração inteligente de usuários aleatórios através de web scraping. Este sistema demonstra como adicionar funcionalidades avançadas mantendo a Clean Architecture.
+Until a suite exists, validate changes manually:
 
-### Estrutura do Domínio
+| Check | Command / action |
+|---|---|
+| Syntax | `python -m compileall app` |
+| Import and startup | `uvicorn app.main:app --reload` with a valid `.env` and reachable MySQL |
+| OpenAPI generation | Open `http://localhost:8000/openapi.json` |
+| Authentication | Register, log in, and call `GET /api/v1/me` with the bearer token |
+| User CRUD | Exercise list, create, read, update, delete, and the two lookup routes |
+| Error paths | Call with a missing token, a malformed token, a duplicate e-mail, and an unknown ID |
+| Automation | Call the scraper route only with Chrome 144 installed and only in a local environment |
 
-```
-app/domain/automation/
-├── routes.py      # Endpoints HTTP da automação
-├── services.py    # Lógica de geração de usuários
-└── __pycache__/
-```
+Recommended follow-ups: add `pytest` + `httpx`, isolate the database with Testcontainers or a disposable MySQL service, add `ruff` and a type checker, and run the gates in GitHub Actions.
 
-### Arquitetura da Automação
+## Deployment
 
-#### 1. **Camada de Rota** (`routes.py`)
+This repository contains **no production deployment artifacts**:
 
-```python
-@router.post("/automation/scraper/generate-user", 
-             status_code=status.HTTP_201_CREATED, 
-             summary="Automação que cria um usuário com dados aleatórios")
-def generate_user(service: AutomationService = Depends(get_automation_service)):
-    """Automação que cria um usuário com dados aleatórios"""
-    user = service.generate_user()
-    if not user:
-        return error_response("Ocorreu um erro ao gerar um usuário aleatório!", user)
-    return success_response(user, "Novo usuário gerado com sucesso!")
-```
+- No `Dockerfile` and no API service in `docker-compose.yml`.
+- No CI/CD workflow, reverse proxy, TLS configuration, or process manager.
+- No migrations, backup strategy, observability stack, or secret manager.
+- `uvicorn app.main:app --reload` is a development command only.
 
-**Injeção de Dependência:**
-```python
-def get_automation_service(db: Session = Depends(get_db)) -> AutomationService:
-    repo = UserRepository(db)
-    return AutomationService(repo)
-```
+`docker-compose.yml` provisions **local infrastructure only**: MySQL 8.0 and phpMyAdmin. It does not build, run, or scale the API.
 
-#### 2. **Camada de Serviço** (`services.py`)
+A real deployment would need, at minimum: a pinned Python image, a non-root runtime user, a production ASGI server configuration, managed MySQL with backups, a migration tool, secrets injected at runtime, CORS for the actual frontend origin, HTTPS, request limits, structured logs, health checks, and monitoring. Treat all of that as project-specific work, not as something this boilerplate already provides.
 
-```python
-class AutomationService:
-    def __init__(self, repo: UserRepository):
-        self.repo = repo
+## Known Limitations
 
-    def generate_user(self) -> UserRead:
-        """Gera um novo usuário através de um Web Scraper"""
-        generated_user = generate_user_scraper()
-        generated_user.phone = pf.format(generated_user.phone)
-        user_db = self.repo.post(generated_user)
-        return UserRead.model_validate(user_db)
-```
+This section is deliberately explicit. These are current properties of the code, not hidden behavior.
 
-#### 3. **Camada de Infraestrutura** (`infra/scrapers/generate_user.py`)
+### Template status
 
-Utiliza Selenium + undetected-chromedriver para contornar proteções anti-bot.
+- `api-boilerplate` is a learning/reference template, not a production service.
+- There is **no `LICENSE` file**. Copyright and reuse rights are therefore undefined. Add a license before distributing the project or accepting external contributions.
+- No versioned releases, changelog history, or support policy existed before this documentation baseline.
 
-### Fluxo de Geração de Usuários
+### Security and authorization
 
-```
-┌──────────────────────────────────────────────────────────┐
-│  POST /automation/scraper/generate-user                  │
-└────────────────────┬─────────────────────────────────────┘
-                     ↓
-        ┌────────────────────────────┐
-        │  AutomationService         │
-        │  ↓ get_automation_service()│
-        └────────────┬───────────────┘
-                     ↓
-        ┌────────────────────────────┐
-        │  generate_user_scraper()   │
-        │  ↓ Acessa 3 sites:         │
-        │    - gerador-pessoas       │
-        │    - gerador-celular       │
-        │    - gerador-email         │
-        └────────────┬───────────────┘
-                     ↓
-        ┌────────────────────────────┐
-        │  Formatação de Dados       │
-        │  - PhoneFormatter          │
-        │  - BirthFormatter          │
-        └────────────┬───────────────┘
-                     ↓
-        ┌────────────────────────────┐
-        │  UserRepository.post()     │
-        │  ↓ Persistência no BD      │
-        └────────────┬───────────────┘
-                     ↓
-        ┌────────────────────────────┐
-        │  Response (UserRead)       │
-        │  ✅ Sucesso                │
-        └────────────────────────────┘
-```
+- **`GET /api/v1/me` returns the SQLAlchemy `User` object directly, including the `password` hash.** This is the most important issue to fix before any real use. Other user routes return `UserRead`, which excludes the hash.
+- Every authenticated user can read, update, delete, activate, or deactivate **any** user. There are no roles, ownership checks, or admin scopes.
+- There is no CORS middleware. Browser clients served from another origin cannot call the API without a proxy.
+- There is no rate limiting, account lockout, password policy, e-mail verification, or CAPTCHA.
+- JWTs contain only `sub` and `exp`; there is no refresh flow, revocation, issuer/audience validation, or key rotation.
+- `get_current_user` does not reject inactive users. A token issued before deactivation remains valid until it expires.
+- Business failures sometimes return HTTP `200` with `status: "error"`, which breaks client error handling and monitoring.
+- There are no unique constraints on `email` or `username`. Registration checks only for a duplicate e-mail, and concurrent requests can still race.
+- **The direct `POST /api/v1/` creation route stores `UserCreate.password` without hashing it.** Only `/api/v1/register` and `AutomationService` hash passwords before calling the repository. Users created through the router root therefore have plaintext passwords and cannot authenticate through `/login`.
+- Passwords are hashed with bcrypt through Passlib. `passlib==1.7.4` and `bcrypt==4.0.1` are pinned together, which avoids the known Passlib/bcrypt 4.1 incompatibility.
+- `SECRET_KEY` is read from the environment but has no strength validation. A short or default value compromises every token.
 
-### Geração de Usuários Aleatórios
+### API contract and error handling
 
-#### `generate_user_scraper()`
+- Missing IDs on `GET /users/{id}`, `PUT /users/{id}`, `DELETE /users/{id}`, and `PUT /users/active/{id}` can raise a Pydantic validation error (`500`) instead of returning `404`, because `UserRead.model_validate(None)` runs before the route's null check.
+- An empty user list is treated as an error: `GET /api/v1/users` returns HTTP `200` with `status: "error"` when no active users exist.
+- Login accepts only `username`; an e-mail address is not accepted as the identifier.
+- The create route is `POST /api/v1/` (router root), while every other user route starts with `/api/v1/users`. This asymmetry is easy to miss in clients.
 
-Função que automatiza a geração de usuários aleatórios:
+### Data and persistence
 
-**Tecnologias:**
-- **Selenium**: Automação de navegador
-- **undetected-chromedriver**: Contorna detecção anti-bot
-- **Brave Browser** (ou Chrome): Navegador executado
+- No migrations and no automatic table creation. The schema must be created by hand, and model changes require manual database changes.
+- `email` and `username` are `VARCHAR(60)`; long valid addresses can be truncated or rejected depending on MySQL strict mode.
+- `DB_PASS` is concatenated into the connection URL without percent-encoding.
+- The engine uses defaults: no pool sizing, pre-ping, timeouts, or retry policy.
+- The repository commits inside each method. There is no unit-of-work or explicit transaction boundary around multi-step operations.
+- Dates are stored with naive `datetime.now()` values; there is no timezone policy.
 
-**Dados Coletados:**
-- ✅ Nome completo
-- ✅ Data de nascimento (DD/MM/YYYY)
-- ✅ Telefone celular
-- ✅ Email
+### Automation and scraping
 
-**Sites Utilizados:**
-- https://geradornv.com.br/ - Gerador de pessoas (nome + data de nascimento)
-- https://geradornv.com.br/ - Gerador de celular
-- https://geradornv.com.br/ - Gerador de email
+- `app/infra/scrapers/generate_user.py` hardcodes **Chrome major version 144** (`version_main=144`) and runs headless.
+- The scraper depends on the HTML structure of `geradornv.com.br` (people, cellphone, and e-mail generators). Any markup change breaks it.
+- It uses fixed `time.sleep(3)` waits plus explicit waits, so each call is slow and fragile.
+- It creates **synthetic personal data** (name, birth date, phone, e-mail). Do not use it to impersonate real people, and review the third-party site's terms of service, robots policy, and privacy law obligations before enabling it outside a local demo.
+- It requires a local Chrome installation and network access. CI environments without a browser cannot use it.
+- The automation endpoint is protected only by the generic bearer dependency; there is no separate admin scope.
 
-### Helpers de Formatação
+### Tooling and repository hygiene
 
-#### `PhoneFormatter`
+- The dependency file is named **`requeriments.txt`** (misspelled). It is documented as-is. Renaming it to `requirements.txt` is a recommended follow-up, but it must be a deliberate change that updates the README, contributor guide, and any automation together.
+- No `.env.example` is committed. This README documents the variables instead.
+- No tests, linters, formatters, type checks, pre-commit hooks, or CI.
+- `docker-compose.yml` still declares the obsolete top-level `version: '3.9'` key. Compose v2 ignores it with a warning.
+- phpMyAdmin is published on `0.0.0.0:8080` with root credentials and is intended for local development only.
+- Runtime API messages, log messages, and OpenAPI descriptions are in Portuguese and contain encoding damage in the source files (mojibake). Fixing them requires source edits and is intentionally outside this documentation-only change.
+- The project relies on implicit Python namespace packages; there are no `__init__.py` files.
 
-Formata números de telefone para o padrão brasileiro `(XX) XXXXX-XXXX`:
+## Governance
 
-```python
-from app.helpers.phone_formatter import PhoneFormatter as pf
+This repository follows the documentation and governance baseline shared by Felipe Venas projects. **English is the default language for the README, contribution guide, security policy, changelog, and collaboration templates.** Runtime API strings remain in Portuguese for compatibility.
 
-# Exemplo
-formatted = pf.format("11987654321")  # → "(11) 98765-4321"
-```
+| Document | Purpose |
+|---|---|
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Branch/commit flow, architecture rules, manual quality gates, and pull request process |
+| [`SECURITY.md`](SECURITY.md) | Supported versions, private disclosure channel, and security scope |
+| [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) | Community standards and enforcement |
+| [`CHANGELOG.md`](CHANGELOG.md) | Release history ([Keep a Changelog](https://keepachangelog.com/en/1.1.0/) + SemVer) |
+| [`.github/`](.github) | Issue and pull request templates |
+| [`.editorconfig`](.editorconfig) · [`.gitattributes`](.gitattributes) | UTF-8, LF normalization, and final newline rules |
+| `LICENSE` (not present) | Licensing status is undefined; see [License](#license) |
 
-#### `BirthFormatter`
+### Repository standards
 
-Formata datas de nascimento do padrão `DD/MM/YYYY` para objeto `date` Python:
+- **Workflow:** short-lived branches created from **`master`** and merged through pull requests. Do not target `main`.
+- **Commits:** Conventional Commits in English (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`).
+- **Documentation:** keep it factual. Verify versions, paths, and endpoint names against the code; do not describe features that are not implemented.
+- **Architecture:** preserve the `routes -> services -> repositories -> models` direction. Routes must not run SQL; services must not build HTTP responses.
+- **Security:** never commit `.env`, secrets, tokens, logs with personal data, or scraped identities. Use placeholders in examples.
+- **Dependencies:** update `requeriments.txt` when a dependency changes and keep the documented pins in sync.
+- **Quality gate:** until automation exists, run `python -m compileall app` and the manual checklist in [Testing](#testing).
 
-```python
-from app.helpers.birth_formatter import BirthFormatter
+## Related Documentation
 
-# Exemplo
-birth_date = BirthFormatter.format("15/03/1990")  # → date(1990, 3, 15)
-```
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to propose changes and what "done" means.
+- [`SECURITY.md`](SECURITY.md) — how to report vulnerabilities privately.
+- [`CHANGELOG.md`](CHANGELOG.md) — notable changes and the documentation baseline entry.
+- [`app/main.py`](app/main.py) — application factory, OpenAPI metadata, router mounting, and root route.
+- [`app/domain/user/models.py`](app/domain/user/models.py) — source of truth for the `users` table.
+- [`docker-compose.yml`](docker-compose.yml) — local MySQL and phpMyAdmin services.
+- [FastAPI documentation](https://fastapi.tiangolo.com/) — framework reference.
+- [SQLAlchemy 2.0 documentation](https://docs.sqlalchemy.org/en/20/) — ORM and session reference.
+- [Pydantic v2 documentation](https://docs.pydantic.dev/latest/) — validation and settings.
+- [Selenium documentation](https://www.selenium.dev/documentation/) and [undetected-chromedriver](https://github.com/ultrafunkamsterdam/undetected-chromedriver) — browser automation stack.
+- [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) — the architectural idea this layout borrows from.
 
-### Requisitos Técnicos
+## License
 
-| Requisito | Versão | Observação |
-|-----------|--------|-----------|
-| Python | 3.11+ | Requerido para compatibilidade com undetected-chromedriver |
-| Brave Browser ou Chrome | - | Deve estar instalado no sistema |
-| Selenium | 4.40.0+ | Instalado via `requirements.txt` |
-| undetected-chromedriver | 3.5.5+ | Contorna proteções anti-bot |
+**No license file is present in this repository.** Without an explicit license, default copyright applies and reuse, modification, and distribution rights are undefined. The `License: Not specified` badge reflects this status.
 
-### Configuração e Customização
+Before distributing the project, publishing packages, or accepting external contributions, the maintainer should add a `LICENSE` file and update this section and the badge. This documentation change does not choose a license on the maintainer's behalf.
 
-Arquivo: `app/infra/scrapers/generate_user.py`
+<div align="center">
 
-```python
-# Modo headless (sem interface gráfica)
-driver = uc.Chrome(options=options, headless=True)   # True = headless
-```
+Maintained by <b><a href="https://github.com/felipevenas">Felipe Venas</a></b>
 
-### Exemplo de Uso
-
-```bash
-# Iniciar a API
-uvicorn app.main:app --reload
-
-# Chamar o endpoint via curl
-curl -X POST "http://localhost:8000/automation/scraper/generate-user"
-
-# Ou usar o cliente HTTP (Swagger)
-# Acesse: http://localhost:8000/docs
-# Procure por: /automation/scraper/generate-user
-```
-
-### Resposta de Sucesso
-
-```json
-{
-  "status": "success",
-  "message": "Novo usuário gerado com sucesso!",
-  "data": {
-    "id": 1,
-    "name": "João da Silva",
-    "birth_date": "1990-03-15",
-    "phone": "(11) 98765-4321",
-    "email": "joao.silva@example.com"
-  }
-}
-```
-
-### Boas Práticas da Automação
-
-✅ **Fazer:**
-- Usar undetected-chromedriver para evitar bloqueios
-- Configurar timeouts apropriados
-- Implementar retry logic para falhas temporárias
-- Logar operações importantes
-
-❌ **Evitar:**
-- Fazer requisições muito rápidas (respeitar rate limiting)
-- Usar dados scrapeados para fins ilícitos
-- Acessar dados sem consentimento
-- Ignorar robots.txt e termos de serviço
-
-### Limitações Conhecidas
-
-⚠️ A automação depende de:
-- Disponibilidade dos sites geradores
-- Estructura HTML dos sites (mudanças quebram o scraper)
-- Navegador Brave/Chrome instalado e atualizado
-- Conexão de internet estável
-
-## 📝 Convenções
-
-- **Variáveis de Ambiente**: `SNAKE_CASE`
-- **Nomes de Classes**: `PascalCase`
-- **Nomes de Funções**: `snake_case`
-- **Nomes de Arquivos**: `snake_case`
-- **Imports**: Organizados por: stdlib → terceiros → locais
-
-## 🔐 Boas Práticas
-
-- ✅ Usar type hints em todas as funções
-- ✅ Validar dados com Pydantic
-- ✅ Usar async/await quando possível
-- ✅ Manter lógica separada por camadas
-- ✅ Documentar funções complexas
-- ✅ Usar variáveis de ambiente para secrets
-
-## 📚 Referências
-
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [SQLAlchemy 2.0](https://docs.sqlalchemy.org/)
-- [Pydantic v2](https://docs.pydantic.dev/latest/)
-- [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-
----
-
-**Desenvolvido com ❤️**
+</div>
